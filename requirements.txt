@@ -1,0 +1,5 @@
+poetry
+pwntools
+pycryptodome
+gmpy2
+ipykernel
